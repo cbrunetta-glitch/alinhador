@@ -123,7 +123,7 @@ async function chamarAnthropic(apiKey, userContent) {
   return ultimaResposta;
 }
 
-module.exports = async (req, res) => {
+const handler = async (req, res) => {
   // CORS básico (mesmo domínio na Vercel; preflight por segurança)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -210,3 +210,10 @@ Examine a coerência interna desta cadeia e responda no formato JSON especificad
     return res.status(500).json({ error: 'Erro interno. Tente novamente.' });
   }
 };
+
+// A análise leva ~20s; o timeout padrão de função da Vercel é menor que isso.
+// Se a Vercel ignorar este valor, ajustar em Settings > Functions > Max Duration.
+handler.config = { maxDuration: 60 };
+
+module.exports = handler;
+module.exports.config = handler.config;
