@@ -1,0 +1,9 @@
+{
+  "name": "alinhador",
+  "version": "1.0.0",
+  "private": true,
+  "description": "O Alinhador — auditoria de coerência interna do projeto de pesquisa. Suíte pedagógica do Seminário de Pesquisa (Fadisp).",
+  "engines": {
+    "node": ">=18"
+  }
+}

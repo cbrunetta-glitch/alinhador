@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Alinhador — Seminário de Pesquisa</title>
+<style>
+  :root {
+    --navy: #1B2A4A;
+    --navy-deep: #12203B;
+    --gold: #C9A84C;
+    --gold-soft: #E8D9A8;
+    --paper: #F7F5F0;
+    --ink: #1A2236;
+    --tone-a: #EEF2F9;      /* tom do elo A */
+    --tone-a-edge: #8FA3C8;
+    --tone-b: #FBF4E2;      /* tom do elo B */
+    --tone-b-edge: #C9A84C;
+    --ok: #3E7C5B;
+    --warn: #A8552F;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, "Segoe UI", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--navy);
+    color: #fff;
+    padding: 28px 20px 22px;
+    text-align: center;
+    border-bottom: 4px solid var(--gold);
+  }
+  header h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.9rem;
+    letter-spacing: 0.5px;
+    font-weight: 400;
+  }
+  header h1 strong { color: var(--gold); font-weight: 700; }
+  header p { font-size: 0.92rem; opacity: 0.85; margin-top: 6px; }
+  header .lema {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    border: 1px solid rgba(201,168,76,0.5);
+    padding: 4px 14px;
+    border-radius: 2px;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 28px 18px 80px; }
+
+  /* Trilha de etapas */
+  .trilha {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 26px;
+    flex-wrap: wrap;
+  }
+  .trilha span {
+    font-size: 0.78rem;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    border: 1px solid #C9C4B8;
+    color: #8A8578;
+    background: #fff;
+  }
+  .trilha span.ativa {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--gold-soft);
+    font-weight: 600;
+  }
+
+  .cartao {
+    background: #fff;
+    border: 1px solid #DDD8CC;
+    border-radius: 4px;
+    padding: 26px 24px;
+    margin-bottom: 20px;
+  }
+  h2 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: 1.3rem;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .sub { font-size: 0.9rem; color: #6B6656; margin-bottom: 18px; }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 16px 0 5px;
+    letter-spacing: 0.3px;
+  }
+  label .opt { font-weight: 400; color: #8A8578; }
+  input[type="text"], textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    border: 1px solid #C9C4B8;
+    border-radius: 3px;
+    background: #FDFCFA;
+    color: var(--ink);
+    resize: vertical;
+  }
+  input:focus, textarea:focus {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+    border-color: var(--gold);
+  }
+  .dica { font-size: 0.78rem; color: #8A8578; margin-top: 4px; }
+
+  .especifico-linha { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
+  .especifico-linha textarea { flex: 1; min-height: 44px; }
+  .btn-menos {
+    background: none; border: 1px solid #C9C4B8; border-radius: 3px;
+    color: #8A8578; cursor: pointer; font-size: 1rem; padding: 8px 12px; margin-top: 2px;
+  }
+  .btn-menos:hover { color: var(--warn); border-color: var(--warn); }
+
+  button.principal {
+    display: block;
+    width: 100%;
+    margin-top: 26px;
+    background: var(--navy);
+    color: var(--gold-soft);
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    padding: 14px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.principal:hover:not(:disabled) { background: var(--navy-deep); }
+  button.principal:disabled { opacity: 0.55; cursor: wait; }
+  button.secundario {
+    background: none;
+    border: 1px solid var(--navy);
+    color: var(--navy);
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 10px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  button.secundario:hover { background: var(--navy); color: var(--gold-soft); }
+  button.discreto {
+    background: none; border: none; color: var(--navy);
+    font: inherit; font-size: 0.85rem; text-decoration: underline;
+    cursor: pointer; margin-top: 10px;
+  }
+
+  /* Etapa 2 — cartões de tensão */
+  .sintese {
+    border-left: 4px solid var(--gold);
+    background: #fff;
+    padding: 16px 18px;
+    margin-bottom: 22px;
+    font-size: 0.95rem;
+  }
+  .sintese.alinhada { border-left-color: var(--ok); }
+  .tensao {
+    background: #fff;
+    border: 1px solid #DDD8CC;
+    border-radius: 4px;
+    margin-bottom: 26px;
+    overflow: hidden;
+  }
+  .tensao-topo {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .tensao-topo .num {
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+    color: var(--gold);
+  }
+  .tensao-topo .cat {
+    font-size: 0.72rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    border: 1px solid rgba(201,168,76,0.5);
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .lado-a-lado {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  @media (max-width: 620px) { .lado-a-lado { grid-template-columns: 1fr; } }
+  .elo {
+    padding: 16px 18px;
+  }
+  .elo.a { background: var(--tone-a); border-left: 4px solid var(--tone-a-edge); }
+  .elo.b { background: var(--tone-b); border-left: 4px solid var(--tone-b-edge); }
+  .elo .campo {
+    font-size: 0.72rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .elo.a .campo { color: #45608F; }
+  .elo.b .campo { color: #8F7322; }
+  .elo blockquote {
+    font-family: Georgia, serif;
+    font-size: 0.98rem;
+    font-style: italic;
+  }
+  .elo blockquote::before { content: "“"; color: rgba(0,0,0,0.3); }
+  .elo blockquote::after { content: "”"; color: rgba(0,0,0,0.3); }
+  .tensao-corpo { padding: 18px; }
+  .tensao-corpo .pergunta-texto {
+    font-family: Georgia, serif;
+    font-size: 1.08rem;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .tensao-corpo .nota { font-size: 0.85rem; color: #6B6656; }
+
+  /* Etapa 3 — deliberação */
+  .deliberacao {
+    border-top: 1px dashed #C9C4B8;
+    padding: 16px 18px 20px;
+    background: #FDFCFA;
+  }
+  .deliberacao .titulo-delib {
+    font-size: 0.78rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+  .opcoes { display: flex; gap: 8px; flex-wrap: wrap; }
+  .opcoes button {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 8px 14px;
+    border-radius: 3px;
+    border: 1px solid #C9C4B8;
+    background: #fff;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .opcoes button.sel-procede { background: #EAF3EE; border-color: var(--ok); color: var(--ok); font-weight: 700; }
+  .opcoes button.sel-sustento { background: #F9EFE9; border-color: var(--warn); color: var(--warn); font-weight: 700; }
+  .opcoes button.sel-pensar { background: #EEF2F9; border-color: var(--tone-a-edge); color: #45608F; font-weight: 700; }
+  .deliberacao textarea { margin-top: 10px; min-height: 60px; display: none; }
+  .deliberacao textarea.visivel { display: block; }
+
+  .rodape-acoes { text-align: center; margin-top: 10px; }
+  .aviso-copiado {
+    display: none;
+    margin-top: 10px;
+    color: var(--ok);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  /* Estados */
+  .carregando { text-align: center; padding: 50px 20px; }
+  .carregando .selo {
+    width: 54px; height: 54px;
+    border: 3px solid var(--gold-soft);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    animation: girar 0.9s linear infinite;
+  }
+  @keyframes girar { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .carregando .selo { animation: none; } }
+  .carregando p { font-family: Georgia, serif; color: var(--navy); font-size: 1.05rem; }
+  .erro {
+    background: #F9EFE9;
+    border-left: 4px solid var(--warn);
+    color: #6B3A22;
+    padding: 14px 16px;
+    border-radius: 3px;
+    margin-top: 16px;
+    font-size: 0.92rem;
+    display: none;
+  }
+  .oculto { display: none; }
+  footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #8A8578;
+    padding: 18px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>O <strong>Alinhador</strong></h1>
+  <p>Seminário de Pesquisa · Doutorado em Direito · Fadisp</p>
+  <span class="lema">Só pergunta. Quem decide é você.</span>
+</header>
+
+<main>
+  <div class="trilha">
+    <span id="t1" class="ativa">1 · A cadeia</span>
+    <span id="t2">2 · As tensões</span>
+    <span id="t3">3 · Sua deliberação</span>
+  </div>
+
+  <!-- ETAPA 1 -->
+  <section id="etapa1" class="cartao">
+    <h2>Cole a cadeia do seu projeto</h2>
+    <p class="sub">O Alinhador examina o fio que liga tema, pergunta, hipótese e objetivos — e devolve, no máximo, 5 perguntas sobre o que parece desalinhado. Ele não corrige nada. Nada é armazenado.</p>
+
+    <label for="tema">Tema (uma frase)</label>
+    <textarea id="tema" rows="2" placeholder="Ex.: A fundamentação das decisões que aplicam a reserva do possível no STF entre 2015 e 2025"></textarea>
+
+    <label for="pergunta">Pergunta de pesquisa</label>
+    <textarea id="pergunta" rows="2"></textarea>
+
+    <label for="hipotese">Hipótese</label>
+    <textarea id="hipotese" rows="3"></textarea>
+
+    <label for="objetivoGeral">Objetivo geral</label>
+    <textarea id="objetivoGeral" rows="2"></textarea>
+
+    <label>Objetivos específicos</label>
+    <div id="listaEspecificos"></div>
+    <button class="discreto" id="maisEspecifico" type="button">+ adicionar objetivo específico</button>
+
+    <label for="referencias">Referências centrais <span class="opt">(opcional, até 3)</span></label>
+    <textarea id="referencias" rows="2" placeholder="Autor — obra; Autor — obra"></textarea>
+
+    <button class="principal" id="btnExaminar" type="button">Examinar a coerência da cadeia</button>
+    <div class="erro" id="erro1"></div>
+  </section>
+
+  <!-- CARREGANDO -->
+  <section id="carregando" class="cartao carregando oculto">
+    <div class="selo" aria-hidden="true"></div>
+    <p>O Alinhador está seguindo o fio da sua cadeia…</p>
+  </section>
+
+  <!-- ETAPAS 2 e 3 -->
+  <section id="etapa23" class="oculto">
+    <div id="sintese" class="sintese"></div>
+    <div id="tensoes"></div>
+
+    <div class="cartao" id="cartaoAcoes">
+      <h2>Leve sua deliberação para o Caderno</h2>
+      <p class="sub">Marque sua posição em cada pergunta acima. Depois, copie o bloco formatado e cole na seção da Aula 3 do seu Caderno.</p>
+      <div class="rodape-acoes">
+        <button class="principal" id="btnCopiar" type="button">Copiar deliberação para o Caderno</button>
+        <div class="aviso-copiado" id="avisoCopiado">Deliberação copiada. Cole no seu Caderno.</div>
+        <button class="secundario" id="btnNova" type="button">Examinar outra versão da cadeia</button>
+      </div>
+      <div class="erro" id="erro2"></div>
+    </div>
+  </section>
+</main>
+
+<footer>O Alinhador integra a suíte pedagógica da disciplina: O Interrogador · O Alinhador · O Arquiteto · O Parecerista.</footer>
+
+<script>
+(function () {
+  var estado = { perguntas: [], sintese: '', diagnostico: '', deliberacoes: [] };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---- Objetivos específicos dinâmicos ---- */
+  function novaLinhaEspecifico(valor) {
+    var wrap = document.createElement('div');
+    wrap.className = 'especifico-linha';
+    var ta = document.createElement('textarea');
+    ta.rows = 1;
+    ta.placeholder = 'Objetivo específico';
+    if (valor) ta.value = valor;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-menos';
+    btn.setAttribute('aria-label', 'Remover objetivo específico');
+    btn.textContent = '×';
+    btn.onclick = function () {
+      if ($('listaEspecificos').children.length > 1) wrap.remove();
+      else ta.value = '';
+    };
+    wrap.appendChild(ta);
+    wrap.appendChild(btn);
+    $('listaEspecificos').appendChild(wrap);
+  }
+  novaLinhaEspecifico(); novaLinhaEspecifico(); novaLinhaEspecifico();
+  $('maisEspecifico').onclick = function () {
+    if ($('listaEspecificos').children.length < 6) novaLinhaEspecifico();
+  };
+
+  function coletarEspecificos() {
+    var lista = [];
+    var tas = $('listaEspecificos').querySelectorAll('textarea');
+    for (var i = 0; i < tas.length; i++) {
+      var v = tas[i].value.trim();
+      if (v) lista.push(v);
+    }
+    return lista;
+  }
+
+  function mostrarErro(id, msg) {
+    var el = $(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+  function limparErros() {
+    $('erro1').style.display = 'none';
+    $('erro2').style.display = 'none';
+  }
+
+  function trilha(n) {
+    ['t1', 't2', 't3'].forEach(function (t, i) {
+      $(t).className = (i + 1 <= n) ? 'ativa' : '';
+    });
+  }
+
+  /* ---- Etapa 1 → chamada à API ---- */
+  $('btnExaminar').onclick = async function () {
+    limparErros();
+    var corpo = {
+      tema: $('tema').value.trim(),
+      pergunta: $('pergunta').value.trim(),
+      hipotese: $('hipotese').value.trim(),
+      objetivoGeral: $('objetivoGeral').value.trim(),
+      especificos: coletarEspecificos(),
+      referencias: $('referencias').value.trim()
+    };
+    if (!corpo.tema || !corpo.pergunta || !corpo.hipotese || !corpo.objetivoGeral || !corpo.especificos.length) {
+      mostrarErro('erro1', 'Preencha tema, pergunta, hipótese, objetivo geral e ao menos um objetivo específico.');
+      return;
+    }
+
+    $('etapa1').classList.add('oculto');
+    $('carregando').classList.remove('oculto');
+    $('btnExaminar').disabled = true;
+
+    try {
+      var resp = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(corpo)
+      });
+      var dados = await resp.json();
+      if (!resp.ok) throw new Error(dados.error || 'Falha na análise. Tente novamente.');
+
+      estado.perguntas = Array.isArray(dados.perguntas) ? dados.perguntas.slice(0, 5) : [];
+      estado.sintese = dados.sintese || '';
+      estado.diagnostico = dados.diagnostico || 'tensoes';
+      estado.deliberacoes = estado.perguntas.map(function () { return { posicao: null, nota: '' }; });
+
+      renderizar();
+      $('carregando').classList.add('oculto');
+      $('etapa23').classList.remove('oculto');
+      trilha(2);
+      window.scrollTo({ top: 0 });
+    } catch (e) {
+      $('carregando').classList.add('oculto');
+      $('etapa1').classList.remove('oculto');
+      mostrarErro('erro1', e.message);
+    } finally {
+      $('btnExaminar').disabled = false;
+    }
+  };
+
+  /* ---- Renderização das tensões + deliberação ---- */
+  function renderizar() {
+    var s = $('sintese');
+    s.className = 'sintese' + (estado.diagnostico === 'alinhada' ? ' alinhada' : '');
+    s.textContent = estado.sintese ||
+      (estado.diagnostico === 'alinhada'
+        ? 'Não encontrei desalinhamentos relevantes nesta cadeia.'
+        : 'Encontrei pontos de tensão na sua cadeia. Examine cada um.');
+
+    var cont = $('tensoes');
+    cont.innerHTML = '';
+
+    if (!estado.perguntas.length) {
+      var vazio = document.createElement('div');
+      vazio.className = 'cartao';
+      vazio.innerHTML = '<h2>Nenhuma pergunta desta vez</h2><p class="sub">A cadeia se sustentou neste exame. Isso não é um selo de aprovação — é o registro sóbrio de que o fio, hoje, não se rompeu. Registre no Caderno e siga.</p>';
+      cont.appendChild(vazio);
+      $('cartaoAcoes').querySelector('#btnCopiar').textContent = 'Copiar registro para o Caderno';
+      return;
+    }
+
+    estado.perguntas.forEach(function (p, idx) {
+      var card = document.createElement('article');
+      card.className = 'tensao';
+
+      var eloA = p.elo_a || { campo: '', trecho: '' };
+      var eloB = p.elo_b || { campo: '', trecho: '' };
+
+      card.innerHTML =
+        '<div class="tensao-topo">' +
+          '<span class="num">Pergunta ' + (idx + 1) + ' de ' + estado.perguntas.length + '</span>' +
+          '<span class="cat">' + escapar(p.categoria_nome || ('Categoria ' + p.categoria)) + '</span>' +
+        '</div>' +
+        '<div class="lado-a-lado">' +
+          '<div class="elo a"><div class="campo">' + escapar(eloA.campo) + '</div><blockquote>' + escapar(eloA.trecho) + '</blockquote></div>' +
+          '<div class="elo b"><div class="campo">' + escapar(eloB.campo) + '</div><blockquote>' + escapar(eloB.trecho) + '</blockquote></div>' +
+        '</div>' +
+        '<div class="tensao-corpo">' +
+          '<p class="pergunta-texto">' + escapar(p.pergunta) + '</p>' +
+          (p.nota ? '<p class="nota">' + escapar(p.nota) + '</p>' : '') +
+        '</div>' +
+        '<div class="deliberacao">' +
+          '<div class="titulo-delib">Sua deliberação</div>' +
+          '<div class="opcoes">' +
+            '<button type="button" data-idx="' + idx + '" data-pos="procede">Procede — vou ajustar</button>' +
+            '<button type="button" data-idx="' + idx + '" data-pos="sustento">Não procede — sustento</button>' +
+            '<button type="button" data-idx="' + idx + '" data-pos="pensar">Preciso pensar</button>' +
+          '</div>' +
+          '<textarea data-nota="' + idx + '" placeholder=""></textarea>' +
+        '</div>';
+
+      cont.appendChild(card);
+    });
+
+    cont.querySelectorAll('.opcoes button').forEach(function (btn) {
+      btn.onclick = function () {
+        var idx = parseInt(btn.getAttribute('data-idx'), 10);
+        var pos = btn.getAttribute('data-pos');
+        estado.deliberacoes[idx].posicao = pos;
+
+        var grupo = btn.parentElement.querySelectorAll('button');
+        grupo.forEach(function (b) { b.className = ''; });
+        btn.className = 'sel-' + pos;
+
+        var ta = cont.querySelector('textarea[data-nota="' + idx + '"]');
+        if (pos === 'procede') {
+          ta.placeholder = 'O que você vai mudar?';
+          ta.classList.add('visivel');
+        } else if (pos === 'sustento') {
+          ta.placeholder = 'Por que a objeção não procede?';
+          ta.classList.add('visivel');
+        } else {
+          ta.placeholder = 'Anote a dúvida para os trios da aula (opcional)';
+          ta.classList.add('visivel');
+        }
+        ta.oninput = function () { estado.deliberacoes[idx].nota = ta.value; };
+      };
+    });
+  }
+
+  function escapar(txt) {
+    var d = document.createElement('div');
+    d.textContent = txt == null ? '' : String(txt);
+    return d.innerHTML;
+  }
+
+  /* ---- Copiar deliberação ---- */
+  $('btnCopiar').onclick = async function () {
+    limparErros();
+    var rotulo = { procede: 'PROCEDE — vou ajustar', sustento: 'NÃO PROCEDE — sustento', pensar: 'PRECISO PENSAR' };
+    var linhas = [];
+    linhas.push('DELIBERAÇÃO — O ALINHADOR (Aula 3)');
+    linhas.push('Data: ' + new Date().toLocaleDateString('pt-BR'));
+    linhas.push('');
+    linhas.push('Síntese do exame: ' + estado.sintese);
+    linhas.push('');
+
+    if (!estado.perguntas.length) {
+      linhas.push('O Alinhador não encontrou desalinhamentos nesta versão da cadeia.');
+    } else {
+      var pendentes = estado.deliberacoes.filter(function (d) { return !d.posicao; }).length;
+      if (pendentes > 0) {
+        mostrarErro('erro2', 'Você ainda não marcou posição em ' + pendentes + ' pergunta(s). Delibere sobre todas antes de copiar.');
+        return;
+      }
+      estado.perguntas.forEach(function (p, i) {
+        var d = estado.deliberacoes[i];
+        linhas.push('— PERGUNTA ' + (i + 1) + ' [' + (p.categoria_nome || '') + ']');
+        linhas.push('  Tensão: ' + (p.elo_a && p.elo_a.campo) + ' “' + (p.elo_a && p.elo_a.trecho) + '” × ' + (p.elo_b && p.elo_b.campo) + ' “' + (p.elo_b && p.elo_b.trecho) + '”');
+        linhas.push('  O Alinhador perguntou: ' + p.pergunta);
+        linhas.push('  Minha posição: ' + rotulo[d.posicao]);
+        if (d.nota) linhas.push('  Minha nota: ' + d.nota);
+        linhas.push('');
+      });
+    }
+    var texto = linhas.join('\n');
+    try {
+      await navigator.clipboard.writeText(texto);
+    } catch (e) {
+      // fallback para navegadores restritivos
+      var ta = document.createElement('textarea');
+      ta.value = texto;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    $('avisoCopiado').style.display = 'block';
+    trilha(3);
+    setTimeout(function () { $('avisoCopiado').style.display = 'none'; }, 4000);
+  };
+
+  /* ---- Nova rodada ---- */
+  $('btnNova').onclick = function () {
+    $('etapa23').classList.add('oculto');
+    $('etapa1').classList.remove('oculto');
+    trilha(1);
+    window.scrollTo({ top: 0 });
+  };
+})();
+</script>
+</body>
+</html>
