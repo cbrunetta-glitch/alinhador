@@ -6,7 +6,7 @@ Auditoria de coerência interna do projeto de pesquisa (tema → pergunta → hi
 Suíte pedagógica do Seminário de Pesquisa (Doutorado em Direito, Fadisp):
 O Interrogador · **O Alinhador** · O Arquiteto · O Parecerista.
 
-**Em produção:** https://alinhador-lime.vercel.app
+**Em produção:** https://oalinhadorfadisp.com (URL interna da Vercel: `alinhador-lime.vercel.app`)
 
 ## Estrutura
 
