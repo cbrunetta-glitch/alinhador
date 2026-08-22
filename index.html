@@ -562,7 +562,7 @@
           ta.placeholder = 'Por que a objeção não procede?';
           ta.classList.add('visivel');
         } else {
-          ta.placeholder = 'Anote a dúvida para os trios da aula (opcional)';
+          ta.placeholder = '';
           ta.classList.add('visivel');
         }
         ta.oninput = function () { estado.deliberacoes[idx].nota = ta.value; };
