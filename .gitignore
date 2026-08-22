@@ -5,3 +5,6 @@ node_modules/
 *.local
 env.local.txt
 .DS_Store
+
+.vercel
+.env*
