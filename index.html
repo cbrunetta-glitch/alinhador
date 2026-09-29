@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>O Alinhador — Seminário de Pesquisa</title>
+<title>O Alinhador — A Oficina · PPGD/FADISP</title>
 <style>
   :root {
     --navy: #1B2A4A;
@@ -313,13 +313,28 @@
     color: #8A8578;
     padding: 18px;
   }
+
+  /* ── Identidade do Élis (mestradoedoutorado.alfa.br), desde 29/09/2026 ──
+     Os sistemas da Escola de Direito se leem como conjunto. Este bloco só
+     redefine cores e o cabeçalho; apagá-lo devolve o visual anterior.
+     navy → tinta quase preta (texto e botões pretos, como no Élis);
+     gold → o vermelho do Élis; paper → o cinza-claro de fundo do Élis. */
+  :root {
+    --navy: #1A1A1A; --navy-deep: #000000;
+    --gold: #D92322; --gold-soft: #FFFFFF;
+    --paper: #F2F3F5; --ink: #1A1A1A;
+    --tone-b-edge: #D92322;
+  }
+  header { background: #D92322; border-bottom: none; }
+  header h1 strong { color: #FFFFFF; }
+  header .lema { color: #FFFFFF; border-color: rgba(255,255,255,0.6); }
 </style>
 </head>
 <body>
 
 <header>
   <h1>O <strong>Alinhador</strong></h1>
-  <p>Seminário de Pesquisa · Doutorado em Direito · FADISP</p>
+  <p>Ferramentas de pesquisa · Mestrado e Doutorado em Direito · FADISP</p>
   <span class="lema">Só pergunta. Quem decide é você.</span>
 </header>
 
